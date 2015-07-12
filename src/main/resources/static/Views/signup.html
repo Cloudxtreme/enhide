@@ -1,0 +1,35 @@
+﻿<md-content layout="row" layout-align="center center" layout-padding layout-margin layout-fill>
+    <md-whiteframe flex-sm="90" flex-md="50" flex="30" class="md-whiteframe-z1">
+        <form name="signupCtrl.signupForm" ng-submit="signupCtrl.signup()">
+            <md-input-container>
+                <label>Display Name</label>
+                <input md-maxlength="50" required name="name" ng-model="signupCtrl.name">
+            </md-input-container>
+            <md-input-container>
+                <label>Username</label>
+                <input md-maxlength="50" required name="username" ng-model="signupCtrl.username">
+            </md-input-container>
+            <md-input-container>
+                <label>Password</label>
+                <input type="password" name="password" ng-model="signupCtrl.password" required md-maxlength="50" ng-change="signupCtrl.passwordsChanged()">
+            </md-input-container>
+            <md-input-container>
+                <label>Retype Password</label>
+                <input type="password" name="retypedPassword" ng-model="signupCtrl.retypedPassword" required md-maxlength="50" ng-change="signupCtrl.passwordsChanged()">
+                <div ng-messages="signupForm.retypedPassword.$error">
+                    <div ng-message="mismatch" ng-show="signupCtrl.password !== signupCtrl.retypedPassword">The passwords you typed mismatch.</div>
+                </div>
+            </md-input-container>
+            <section layout="row" layout-sm="row" layout-align="center center">
+                <img src="{{signupCtrl.captchaImage}}" />
+                <md-input-container flex>
+                    <label>Type text in the image here</label>
+                    <input md-maxlength="50" required name="solution" ng-model="signupCtrl.solution">
+                </md-input-container>
+            </section>
+            <section layout="row" layout-sm="row" layout-align="center center">
+                <md-button flex class="md-raised md-primary">Signup</md-button>
+            </section>
+        </form>
+    </md-whiteframe>
+</md-content>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="edwin" id="1436700828410-1">
+        <insert tableName="ROLE">
+            <column name="ID" valueNumeric="1"/>
+            <column name="CREATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="UPDATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="VERSION" valueNumeric="0"/>
+            <column name="NAME" value="ROLE_USER"/>
+        </insert>
+        <insert tableName="ROLE">
+            <column name="ID" valueNumeric="2"/>
+            <column name="CREATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="UPDATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="VERSION" valueNumeric="0"/>
+            <column name="NAME" value="ROLE_ADMIN"/>
+        </insert>
+        <insert tableName="ROLE">
+            <column name="ID" valueNumeric="3"/>
+            <column name="CREATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="UPDATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="VERSION" valueNumeric="0"/>
+            <column name="NAME" value="ROLE_GUEST"/>
+        </insert>
+    </changeSet>
+    <changeSet author="edwin" id="1436700828410-2">
+        <insert tableName="USER">
+            <column name="ID" valueNumeric="1"/>
+            <column name="CREATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="UPDATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="VERSION" valueNumeric="0"/>
+            <column name="LOGIN" value="admin"/>
+            <column name="NAME" value="Administrator"/>
+            <column name="PASSWORD" value="$2a$10$WrAprIfLw2fVi/Nh/yxeBu3QiKU8KRgnwetFSs9WsfbyXPChv5WfK"/>
+        </insert>
+        <insert tableName="USER">
+            <column name="ID" valueNumeric="2"/>
+            <column name="CREATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="UPDATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="VERSION" valueNumeric="0"/>
+            <column name="LOGIN" value="test"/>
+            <column name="NAME" value="Test"/>
+            <column name="PASSWORD" value="$2a$10$WrAprIfLw2fVi/Nh/yxeBu3QiKU8KRgnwetFSs9WsfbyXPChv5WfK"/>
+        </insert>
+        <insert tableName="USER">
+            <column name="ID" valueNumeric="3"/>
+            <column name="CREATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="UPDATED_AT" valueDate="1970-01-01 00:00:00.0"/>
+            <column name="VERSION" valueNumeric="0"/>
+            <column name="LOGIN" value="guest"/>
+            <column name="NAME" value="Guest"/>
+            <column name="PASSWORD" value="$2a$10$WrAprIfLw2fVi/Nh/yxeBu3QiKU8KRgnwetFSs9WsfbyXPChv5WfK"/>
+        </insert>
+    </changeSet>
+    <changeSet author="edwin" id="1436700828410-3">
+        <insert tableName="USER_ROLE">
+            <column name="USER_ID" valueNumeric="1"/>
+            <column name="ROLE_ID" valueNumeric="1"/>
+        </insert>
+        <insert tableName="USER_ROLE">
+            <column name="USER_ID" valueNumeric="1"/>
+            <column name="ROLE_ID" valueNumeric="2"/>
+        </insert>
+        <insert tableName="USER_ROLE">
+            <column name="USER_ID" valueNumeric="2"/>
+            <column name="ROLE_ID" valueNumeric="1"/>
+        </insert>
+        <insert tableName="USER_ROLE">
+            <column name="USER_ID" valueNumeric="3"/>
+            <column name="ROLE_ID" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
