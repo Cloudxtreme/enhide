@@ -7,6 +7,7 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import java.io.File;
+import java.util.List;
 import javax.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,25 @@ public class EmailService {
   @Value(value = "${mailgun.resource}")
   private String resource;
 
-  public ClientResponse sendMimeMessage() {
+  public ClientResponse sendMimeMessage(
+          String from,
+          List<String> tos,
+          List<String> ccs,
+          List<String> bccs) {
     Client client = Client.create();
     client.addFilter(new HTTPBasicAuthFilter("api", key));
     WebResource webResource = client.resource(resource);
     FormDataMultiPart form = new FormDataMultiPart();
-    form.field("to", "edwinhere@gmail.com");
+    form.field("from", from);
+    for (String to : tos) {
+      form.field("to", to);
+    }
+    for (String cc : ccs) {
+      form.field("cc", cc);
+    }
+    for (String bcc : bccs) {
+      form.field("bcc", bcc);
+    }
     File mimeFile = new File("message.mime");
     form.bodyPart(new FileDataBodyPart("message", mimeFile,
             MediaType.APPLICATION_OCTET_STREAM_TYPE));
