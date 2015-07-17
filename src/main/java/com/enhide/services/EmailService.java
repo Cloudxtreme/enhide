@@ -1,5 +1,7 @@
 package com.enhide.services;
 
+import com.enhide.models.transitory.EncryptedEmail;
+import com.enhide.models.transitory.SignedEmail;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -46,20 +48,20 @@ public class EmailService {
 	@Value(value = "${mailgun.resource}")
 	private String resource;
 
-	public ClientResponse sendEncryptedMime(
-		String from,
-		List<String> tos,
-		List<String> ccs,
-		List<String> bccs,
-		String subject,
-		String pgp
-	) throws IOException, ParseException {
+	public ClientResponse sendEncryptedMime(EncryptedEmail email)
+		throws IOException, ParseException {
 		Client client = Client.create();
 		client.addFilter(new HTTPBasicAuthFilter("api", key));
 		WebResource webResource = client.resource(resource);
 		FormDataMultiPart form = new FormDataMultiPart();
-		InputStream inputStream = createPgpMime(from, tos, ccs, bccs, subject, pgp);
-		for (String to : tos) {
+		InputStream inputStream = createEncryptedMime(
+			email.getFrom(),
+			email.getTos(),
+			email.getCcs(),
+			email.getBccs(),
+			email.getSubject(),
+			email.getMessage());
+		for (String to : email.getTos()) {
 			form.field("to", to);
 		}
 		form.bodyPart(new StreamDataBodyPart("message", inputStream));
@@ -69,20 +71,21 @@ public class EmailService {
 	}
 
 	public ClientResponse sendSignedMime(
-		String from,
-		List<String> tos,
-		List<String> ccs,
-		List<String> bccs,
-		String subject,
-		String clearText,
-		String singature
+		SignedEmail email
 	) throws IOException, ParseException {
 		Client client = Client.create();
 		client.addFilter(new HTTPBasicAuthFilter("api", key));
 		WebResource webResource = client.resource(resource);
 		FormDataMultiPart form = new FormDataMultiPart();
-		InputStream inputStream = createSignedMime(from, tos, ccs, bccs, subject, clearText, singature);
-		for (String to : tos) {
+		InputStream inputStream = createSignedMime(
+			email.getFrom(),
+			email.getTos(),
+			email.getCcs(),
+			email.getBccs(),
+			email.getSubject(),
+			email.getClearText(),
+			email.getSignature());
+		for (String to : email.getTos()) {
 			form.field("to", to);
 		}
 		form.bodyPart(new StreamDataBodyPart("message", inputStream));
@@ -91,13 +94,13 @@ public class EmailService {
 			.post(ClientResponse.class, form);
 	}
 
-	private InputStream createPgpMime(
+	private InputStream createEncryptedMime(
 		String from,
 		List<String> tos,
 		List<String> ccs,
 		List<String> bccs,
 		String subject,
-		String pgp
+		String encrypted
 	) throws IOException, ParseException {
 		MessageBuilder builder = new DefaultMessageBuilder();
 		Message message = builder.newMessage();
@@ -151,7 +154,7 @@ public class EmailService {
 					octets.setBody(new SingleBody() {
 						@Override
 						public InputStream getInputStream() throws IOException {
-							return new ByteArrayInputStream(pgp.getBytes(StandardCharsets.US_ASCII));
+							return new ByteArrayInputStream(encrypted.getBytes(StandardCharsets.US_ASCII));
 						}
 					});
 					multipart.addBodyPart(octets);

@@ -1,6 +1,8 @@
 package com.enhide.services;
 
 import com.enhide.Main;
+import com.enhide.models.transitory.EncryptedEmail;
+import com.enhide.models.transitory.SignedEmail;
 import com.sun.jersey.api.client.ClientResponse;
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,7 +27,7 @@ public class EmailServiceTest {
 	@Autowired
 	private EmailService emailService;
 
-	@Test
+//	@Test
 	public void testSendMimeMessage() throws IOException, ParseException {
 		String pgp = "-----BEGIN PGP MESSAGE-----\n"
 			+ "Version: GnuPG v2\n"
@@ -50,18 +52,19 @@ public class EmailServiceTest {
 			+ "=fssi\n"
 			+ "-----END PGP MESSAGE-----\n";
 
-		ClientResponse sendMimeMessage = emailService.sendEncryptedMime(
-			"Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>",
-			Arrays.asList("edwinhere@gmail.com"),
-			Arrays.asList(new String[]{}),
-			Arrays.asList(new String[]{}),
-			"multipart/encrypted Test",
-			pgp
-		);
+		EncryptedEmail email = new EncryptedEmail();
+		email.setFrom("Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>");
+		email.setTos(Arrays.asList("edwinhere@gmail.com"));
+		email.setCcs(Arrays.asList(new String[]{}));
+		email.setBccs(Arrays.asList(new String[]{}));
+		email.setSubject("multipart/encrypted Test");
+		email.setMessage(pgp);
+
+		ClientResponse sendMimeMessage = emailService.sendEncryptedMime(email);
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
 
-	@Test
+//	@Test
 	public void testSendSignedMime() throws IOException, ParseException {
 		String clearText = "Hi, I'm Testing signed unencrypted PGP/MIME\n"
 			+ "\n"
@@ -84,15 +87,16 @@ public class EmailServiceTest {
 			+ "=Sc1/\n"
 			+ "-----END PGP SIGNATURE-----\n";
 
-		ClientResponse sendMimeMessage = emailService.sendSignedMime(
-			"Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>",
-			Arrays.asList("accenture.programmer@gmail.com"),
-			Arrays.asList(new String[]{}),
-			Arrays.asList(new String[]{}),
-			"multipart/signed Test",
-			clearText,
-			pgp
-		);
+		SignedEmail email = new SignedEmail();
+		email.setFrom("Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>");
+		email.setTos(Arrays.asList("edwinhere@gmail.com"));
+		email.setCcs(Arrays.asList(new String[]{}));
+		email.setBccs(Arrays.asList(new String[]{}));
+		email.setSubject("multipart/signed Test");
+		email.setClearText(clearText);
+		email.setSignature(pgp);
+
+		ClientResponse sendMimeMessage = emailService.sendSignedMime(email);
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
 }
