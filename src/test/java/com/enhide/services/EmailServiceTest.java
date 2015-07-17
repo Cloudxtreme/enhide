@@ -50,12 +50,47 @@ public class EmailServiceTest {
 			+ "=fssi\n"
 			+ "-----END PGP MESSAGE-----\n";
 
-		ClientResponse sendMimeMessage = emailService.sendPgpMime(
+		ClientResponse sendMimeMessage = emailService.sendEncryptedMime(
 			"Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>",
 			Arrays.asList("edwinhere@gmail.com"),
 			Arrays.asList(new String[]{}),
 			Arrays.asList(new String[]{}),
-			"Hello",
+			"multipart/encrypted Test",
+			pgp
+		);
+		Assert.isTrue(sendMimeMessage.getStatus() == 200);
+	}
+
+	@Test
+	public void testSendSignedMime() throws IOException, ParseException {
+		String clearText = "Hi, I'm Testing signed unencrypted PGP/MIME\n"
+			+ "\n"
+			+ "Edwin\n\n";
+		String pgp = "-----BEGIN PGP SIGNATURE-----\n"
+			+ "Version: GnuPG v2\n"
+			+ "\n"
+			+ "iQIcBAEBCAAGBQJVpNL3AAoJEK5vpWWqPiw4bh4QAOBUuhAMF3ECbk/Puyrw9iEW\n"
+			+ "XhDmP7yY9sV3mKN3vCEcxi5KzQ0/mYqV6XopgseEMPmbtkIDZ6VcUPve2UUf/Ief\n"
+			+ "ZHS9k7ZbQXrPSU59lEhI551tagzAXvnuZnDQQMh4uXrmmub0TCcPRJHgZ7MxO80g\n"
+			+ "2V4nmHs4oPnjF0sfKqD44G797+fCtOyFugM9YymEmlCitW6MiEVd5tZx3oCAFHhI\n"
+			+ "0ibrIbhpj7eYo2DJ235kbABR9UWNM5JeJk+klPjpgcQae76eO58LQD9FrDH4+x4b\n"
+			+ "st3Lgk//h9CTVSaZ0d0nOEL2xcIT37nngmw4v8jmRSW3S+R+xk8kzGqesARaz3DZ\n"
+			+ "c1VC8bNEp3Fc/PqFCZrJAJDaOCI4fhC92/dvPrXdHec1SJSu/BIRkgoubOUIl8wb\n"
+			+ "dt52/grDjxVG6jNRXHYEPyEScCbEGgroHdUb2eA9a+sVxnXMKA1g9ovaUxM4YdTI\n"
+			+ "9NV0li5OQ/7uk0HyxNcmTzZ+76mToM6gA4kurxxUDuHQ+R/1RXxhzGYUZG2sqypE\n"
+			+ "xgvA9Dt/7KLdOtYu5yYfz9RJjqZvYZmNFlufEG2PFxMiAkDowfvfp9mzGFlFqXth\n"
+			+ "a/rASXilWte4kIEoygxVBFqF5CKpe8UwVA+0HyBHgLb/8/TYigVfmxFWACGby1Y5\n"
+			+ "OhJBd4TuNKom7utNEHnT\n"
+			+ "=Sc1/\n"
+			+ "-----END PGP SIGNATURE-----\n";
+
+		ClientResponse sendMimeMessage = emailService.sendSignedMime(
+			"Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>",
+			Arrays.asList("accenture.programmer@gmail.com"),
+			Arrays.asList(new String[]{}),
+			Arrays.asList(new String[]{}),
+			"multipart/signed Test",
+			clearText,
 			pgp
 		);
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
