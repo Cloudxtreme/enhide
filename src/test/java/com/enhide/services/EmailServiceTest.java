@@ -50,7 +50,7 @@ public class EmailServiceTest {
 			+ "=fssi\n"
 			+ "-----END PGP MESSAGE-----\n";
 
-		ClientResponse sendMimeMessage = emailService.sendMimeMessage(
+		ClientResponse sendMimeMessage = emailService.sendPgpMime(
 			"Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>",
 			Arrays.asList("edwinhere@gmail.com"),
 			Arrays.asList(new String[]{}),

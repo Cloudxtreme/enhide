@@ -44,7 +44,7 @@ public class EmailService {
 	@Value(value = "${mailgun.resource}")
 	private String resource;
 
-	public ClientResponse sendMimeMessage(
+	public ClientResponse sendPgpMime(
 		String from,
 		List<String> tos,
 		List<String> ccs,
@@ -56,7 +56,7 @@ public class EmailService {
 		client.addFilter(new HTTPBasicAuthFilter("api", key));
 		WebResource webResource = client.resource(resource);
 		FormDataMultiPart form = new FormDataMultiPart();
-		InputStream inputStream = encrypt(from, tos, ccs, bccs, subject, pgp);
+		InputStream inputStream = createPgpMime(from, tos, ccs, bccs, subject, pgp);
 		for (String to : tos) {
 			form.field("to", to);
 		}
@@ -66,7 +66,7 @@ public class EmailService {
 			.post(ClientResponse.class, form);
 	}
 
-	private InputStream encrypt(
+	private InputStream createPgpMime(
 		String from,
 		List<String> tos,
 		List<String> ccs,
