@@ -22,7 +22,13 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@objectId")
-class Address {
+public class Address {
+
+	public static Address fromString(String address) {
+		Address a = new Address();
+		a.setValue(address);
+		return a;
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

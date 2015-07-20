@@ -1,11 +1,14 @@
 package com.enhide.services;
 
 import com.enhide.Main;
-import com.enhide.models.transitory.EncryptedEmail;
-import com.enhide.models.transitory.SignedEmail;
+import com.enhide.models.persistent.Address;
+import com.enhide.models.persistent.Email;
 import com.sun.jersey.api.client.ClientResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +30,7 @@ public class EmailServiceTest {
 	@Autowired
 	private EmailService emailService;
 
-//	@Test
+	@Test
 	public void testSendMimeMessage() throws IOException, ParseException {
 		String pgp = "-----BEGIN PGP MESSAGE-----\n"
 			+ "Version: GnuPG v2\n"
@@ -52,11 +55,20 @@ public class EmailServiceTest {
 			+ "=fssi\n"
 			+ "-----END PGP MESSAGE-----\n";
 
-		EncryptedEmail email = new EncryptedEmail();
-		email.setFrom("Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>");
-		email.setTos(Arrays.asList("edwinhere@gmail.com"));
-		email.setCcs(Arrays.asList(new String[]{}));
-		email.setBccs(Arrays.asList(new String[]{}));
+		Set<Address> froms = new HashSet<>();
+		froms.addAll((Collection<Address>) Arrays.asList(Address.fromString("Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>")));
+		Set<Address> tos = new HashSet<>();
+		tos.addAll((Collection<Address>) Arrays.asList(Address.fromString("edwinhere@gmail.com")));
+		Set<Address> ccs = new HashSet<>();
+		ccs.addAll((Collection<Address>) Arrays.asList(new Address[]{}));
+		Set<Address> bccs = new HashSet<>();
+		bccs.addAll((Collection<Address>) Arrays.asList(new Address[]{}));
+
+		Email email = new Email();
+		email.setFroms(froms);
+		email.setTos(tos);
+		email.setCcs(ccs);
+		email.setBccs(bccs);
 		email.setSubject("multipart/encrypted Test");
 		email.setMessage(pgp);
 
@@ -64,7 +76,7 @@ public class EmailServiceTest {
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
 
-//	@Test
+	@Test
 	public void testSendSignedMime() throws IOException, ParseException {
 		String clearText = "Hi, I'm Testing signed unencrypted PGP/MIME\n"
 			+ "\n"
@@ -87,11 +99,20 @@ public class EmailServiceTest {
 			+ "=Sc1/\n"
 			+ "-----END PGP SIGNATURE-----\n";
 
-		SignedEmail email = new SignedEmail();
-		email.setFrom("Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>");
-		email.setTos(Arrays.asList("edwinhere@gmail.com"));
-		email.setCcs(Arrays.asList(new String[]{}));
-		email.setBccs(Arrays.asList(new String[]{}));
+		Set<Address> froms = new HashSet<>();
+		froms.addAll((Collection<Address>) Arrays.asList(Address.fromString("Excited User <mailgun@sandboxe61c04d2f5d7416c9137dc01dc3fd3b4.mailgun.org>")));
+		Set<Address> tos = new HashSet<>();
+		tos.addAll((Collection<Address>) Arrays.asList(Address.fromString("edwinhere@gmail.com")));
+		Set<Address> ccs = new HashSet<>();
+		ccs.addAll((Collection<Address>) Arrays.asList(new Address[]{}));
+		Set<Address> bccs = new HashSet<>();
+		bccs.addAll((Collection<Address>) Arrays.asList(new Address[]{}));
+
+		Email email = new Email();
+		email.setFroms(froms);
+		email.setTos(tos);
+		email.setCcs(ccs);
+		email.setBccs(bccs);
 		email.setSubject("multipart/signed Test");
 		email.setClearText(clearText);
 		email.setSignature(pgp);
