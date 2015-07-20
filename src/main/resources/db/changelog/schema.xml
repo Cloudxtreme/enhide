@@ -1,89 +1,194 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
-    <changeSet author="edwin" id="1436700276542-1">
-        <createTable tableName="CAPTCHA">
-            <column autoIncrement="true" name="ID" type="BIGINT">
-                <constraints primaryKey="true" primaryKeyName="SYS_PK_10094"/>
-            </column>
-            <column name="CREATED_AT" type="TIMESTAMP"/>
-            <column name="UPDATED_AT" type="TIMESTAMP"/>
-            <column name="VERSION" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="HASH" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="SOLUTION" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-2">
-        <createTable tableName="ROLE">
-            <column autoIncrement="true" name="ID" type="INT">
-                <constraints primaryKey="true" primaryKeyName="SYS_PK_10101"/>
-            </column>
-            <column name="CREATED_AT" type="TIMESTAMP"/>
-            <column name="UPDATED_AT" type="TIMESTAMP"/>
-            <column name="VERSION" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="NAME" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-3">
-        <createTable tableName="USER">
-            <column autoIncrement="true" name="ID" type="INT">
-                <constraints primaryKey="true" primaryKeyName="SYS_PK_10109"/>
-            </column>
-            <column name="CREATED_AT" type="TIMESTAMP"/>
-            <column name="UPDATED_AT" type="TIMESTAMP"/>
-            <column name="VERSION" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="LOGIN" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="NAME" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="PASSWORD" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-4">
-        <createTable tableName="USER_ROLE">
-            <column name="USER_ID" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ROLE_ID" type="INT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-5">
-        <addPrimaryKey columnNames="USER_ID, ROLE_ID" constraintName="SYS_PK_10117" tableName="USER_ROLE"/>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-6">
-        <addUniqueConstraint columnNames="LOGIN" constraintName="UK_EW1HVAM8UWAKNUAELLWHQCHHB" tableName="USER"/>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-7">
-        <createIndex indexName="SYS_IDX_10127" tableName="USER_ROLE">
-            <column name="ROLE_ID"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-8">
-        <createIndex indexName="SYS_IDX_10131" tableName="USER_ROLE">
-            <column name="USER_ID"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-9">
-        <addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="USER_ROLE" constraintName="FK_APCC8LXK2XNUG8377FATVBN04" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="USER"/>
-    </changeSet>
-    <changeSet author="edwin" id="1436700276542-10">
-        <addForeignKeyConstraint baseColumnNames="ROLE_ID" baseTableName="USER_ROLE" constraintName="FK_IT77EQ964JHFQTU54081EBTIO" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="ROLE"/>
-    </changeSet>
+	<changeSet author="edwin" id="1437407211164-1">
+		<createTable tableName="ADDRESS">
+			<column autoIncrement="true" name="ID" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="SYS_PK_10092"/>
+			</column>
+			<column name="VALUE" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="USER_ID" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-2">
+		<createTable tableName="CAPTCHA">
+			<column autoIncrement="true" name="ID" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="SYS_PK_10100"/>
+			</column>
+			<column name="CREATED_AT" type="TIMESTAMP"/>
+			<column name="UPDATED_AT" type="TIMESTAMP"/>
+			<column name="VERSION" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="HASH" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="SOLUTION" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-3">
+		<createTable tableName="EMAIL">
+			<column autoIncrement="true" name="ID" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="SYS_PK_10110"/>
+			</column>
+			<column name="CREATED_AT" type="TIMESTAMP"/>
+			<column name="UPDATED_AT" type="TIMESTAMP"/>
+			<column name="VERSION" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="CLEAR_TEXT" type="CLOB"/>
+			<column name="MESSAGE" type="CLOB"/>
+			<column name="OTHER" type="CLOB"/>
+			<column name="SIGNATURE" type="CLOB"/>
+			<column name="SUBJECT" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="REPLY_TO_ID" type="BIGINT"/>
+		</createTable>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-4">
+		<createTable tableName="EMAIL_ADDRESS">
+			<column name="EMAIL_ID" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="ADDRESS_ID" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-5">
+		<createTable tableName="ROLE">
+			<column autoIncrement="true" name="ID" type="INT">
+				<constraints primaryKey="true" primaryKeyName="SYS_PK_10130"/>
+			</column>
+			<column name="CREATED_AT" type="TIMESTAMP"/>
+			<column name="UPDATED_AT" type="TIMESTAMP"/>
+			<column name="VERSION" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="NAME" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-6">
+		<createTable tableName="USER">
+			<column autoIncrement="true" name="ID" type="INT">
+				<constraints primaryKey="true" primaryKeyName="SYS_PK_10138"/>
+			</column>
+			<column name="CREATED_AT" type="TIMESTAMP"/>
+			<column name="UPDATED_AT" type="TIMESTAMP"/>
+			<column name="VERSION" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="LOGIN" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="NAME" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="PASSWORD" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-7">
+		<createTable tableName="USER_ADDRESSES">
+			<column name="USER_ID" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="ADDRESSES_ID" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-8">
+		<createTable tableName="USER_ROLE">
+			<column name="USER_ID" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="ROLE_ID" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-9">
+		<addPrimaryKey columnNames="ADDRESS_ID, EMAIL_ID" constraintName="SYS_PK_10121" tableName="EMAIL_ADDRESS"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-10">
+		<addPrimaryKey columnNames="USER_ID, ADDRESSES_ID" constraintName="SYS_PK_10152" tableName="USER_ADDRESSES"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-11">
+		<addPrimaryKey columnNames="USER_ID, ROLE_ID" constraintName="SYS_PK_10163" tableName="USER_ROLE"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-12">
+		<addUniqueConstraint columnNames="LOGIN" constraintName="UK_EW1HVAM8UWAKNUAELLWHQCHHB" tableName="USER"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-13">
+		<addUniqueConstraint columnNames="ADDRESSES_ID" constraintName="UK_I5LP1FVGFVSPLFQWU4OVWPNXS" tableName="USER_ADDRESSES"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-14">
+		<createIndex indexName="SYS_IDX_10117" tableName="EMAIL">
+			<column name="REPLY_TO_ID"/>
+		</createIndex>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-15">
+		<createIndex indexName="SYS_IDX_10125" tableName="EMAIL_ADDRESS">
+			<column name="ADDRESS_ID"/>
+		</createIndex>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-16">
+		<createIndex indexName="SYS_IDX_10127" tableName="EMAIL_ADDRESS">
+			<column name="EMAIL_ID"/>
+		</createIndex>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-17">
+		<createIndex indexName="SYS_IDX_10159" tableName="USER_ADDRESSES">
+			<column name="USER_ID"/>
+		</createIndex>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-18">
+		<createIndex indexName="SYS_IDX_10167" tableName="USER_ROLE">
+			<column name="ROLE_ID"/>
+		</createIndex>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-19">
+		<createIndex indexName="SYS_IDX_10169" tableName="USER_ROLE">
+			<column name="USER_ID"/>
+		</createIndex>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-20">
+		<createIndex indexName="SYS_IDX_10172" tableName="ADDRESS">
+			<column name="USER_ID"/>
+		</createIndex>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-21">
+		<addForeignKeyConstraint baseColumnNames="EMAIL_ID" baseTableName="EMAIL_ADDRESS" constraintName="FK_7CYKUQ7YGGCK767QJISYSRAIK" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="EMAIL"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-22">
+		<addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="ADDRESS" constraintName="FK_7ROD8A71YEP5VXASB0MS3OSBG" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="USER"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-23">
+		<addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="USER_ROLE" constraintName="FK_APCC8LXK2XNUG8377FATVBN04" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="USER"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-24">
+		<addForeignKeyConstraint baseColumnNames="REPLY_TO_ID" baseTableName="EMAIL" constraintName="FK_BPLLNRFD6X5Q708C7TUT7VSOD" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="EMAIL"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-25">
+		<addForeignKeyConstraint baseColumnNames="ADDRESSES_ID" baseTableName="USER_ADDRESSES" constraintName="FK_I5LP1FVGFVSPLFQWU4OVWPNXS" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="ADDRESS"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-26">
+		<addForeignKeyConstraint baseColumnNames="ROLE_ID" baseTableName="USER_ROLE" constraintName="FK_IT77EQ964JHFQTU54081EBTIO" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="ROLE"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-27">
+		<addForeignKeyConstraint baseColumnNames="ADDRESS_ID" baseTableName="EMAIL_ADDRESS" constraintName="FK_MJ6YPVCWD5I0CS4B8XQPA2YA1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="ADDRESS"/>
+	</changeSet>
+	<changeSet author="edwin" id="1437407211164-28">
+		<addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="USER_ADDRESSES" constraintName="FK_Q52S2TAKHSU9YXYODXUJT8FPJ" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="USER"/>
+	</changeSet>
 </databaseChangeLog>

@@ -99,4 +99,8 @@ public class EmailServiceTest {
 		ClientResponse sendMimeMessage = emailService.sendSignedMime(email);
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
+
+	@Test
+	public void testBlank() {
+	}
 }

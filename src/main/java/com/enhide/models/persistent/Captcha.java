@@ -17,9 +17,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@objectId")
-public class Captcha extends Base implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class Captcha extends Base {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

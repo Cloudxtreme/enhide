@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -46,6 +47,9 @@ public class User extends Base {
 		@JoinColumn(name = "role_id")})
 	@JsonIgnore
 	private Set<Role> roles = new HashSet<Role>();
+
+	@OneToMany
+	private Set<Address> addresses = new HashSet<Address>();
 
 	public User() {
 	}
