@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -29,7 +30,7 @@ public class Email extends Base {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	@JoinTable(name = "email_address", joinColumns = {
 		@JoinColumn(name = "email_id")}, inverseJoinColumns = {
 		@JoinColumn(name = "address_id")})
@@ -37,20 +38,20 @@ public class Email extends Base {
 	private Set<Address> froms = new HashSet<Address>();
 	//http://serverfault.com/questions/554520/smtp-allows-for-multiple-from-addresses-in-the-rfc-was-this-ever-useful-why-do
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	@JoinTable(name = "email_address", joinColumns = {
 		@JoinColumn(name = "email_id")}, inverseJoinColumns = {
 		@JoinColumn(name = "address_id")})
 	@NotEmpty
 	private Set<Address> tos = new HashSet<Address>();
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	@JoinTable(name = "email_address", joinColumns = {
 		@JoinColumn(name = "email_id")}, inverseJoinColumns = {
 		@JoinColumn(name = "address_id")})
 	private Set<Address> ccs = new HashSet<Address>();
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	@JoinTable(name = "email_address", joinColumns = {
 		@JoinColumn(name = "email_id")}, inverseJoinColumns = {
 		@JoinColumn(name = "address_id")})

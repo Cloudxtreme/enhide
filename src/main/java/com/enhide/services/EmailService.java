@@ -34,6 +34,8 @@ import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.enhide.models.persistent.Address;
+import com.enhide.repositories.EmailRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -47,6 +49,9 @@ public class EmailService {
 
 	@Value(value = "${mailgun.resource}")
 	private String resource;
+
+	@Autowired
+	private EmailRepository emailRepository;
 
 	public ClientResponse sendEncryptedMime(Email email)
 		throws IOException, ParseException {
@@ -65,9 +70,13 @@ public class EmailService {
 			form.field("to", to.getValue());
 		}
 		form.bodyPart(new StreamDataBodyPart("message", inputStream));
-		return webResource
+		ClientResponse post = webResource
 			.type(MediaType.MULTIPART_FORM_DATA_TYPE)
 			.post(ClientResponse.class, form);
+		if (post.getStatus() == 200) {
+			emailRepository.save(email);
+		}
+		return post;
 	}
 
 	public ClientResponse sendSignedMime(
@@ -89,9 +98,13 @@ public class EmailService {
 			form.field("to", to.getValue());
 		}
 		form.bodyPart(new StreamDataBodyPart("message", inputStream));
-		return webResource
+		ClientResponse post = webResource
 			.type(MediaType.MULTIPART_FORM_DATA_TYPE)
 			.post(ClientResponse.class, form);
+		if (post.getStatus() == 200) {
+			emailRepository.save(email);
+		}
+		return post;
 	}
 
 	private InputStream createEncryptedMime(

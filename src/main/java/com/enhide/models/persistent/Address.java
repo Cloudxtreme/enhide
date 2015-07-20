@@ -45,7 +45,6 @@ public class Address {
 	private Set<Email> emails = new HashSet<Email>();
 
 	@ManyToOne
-	@NotEmpty
 	@JsonIgnore
 	private User user;
 

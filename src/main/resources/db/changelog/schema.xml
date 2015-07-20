@@ -8,9 +8,7 @@
 			<column name="VALUE" type="VARCHAR(255)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="USER_ID" type="INT">
-				<constraints nullable="false"/>
-			</column>
+			<column name="USER_ID" type="INT"/>
 		</createTable>
 	</changeSet>
 	<changeSet author="edwin" id="1437407211164-2">
