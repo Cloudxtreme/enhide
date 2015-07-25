@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.enhide.models.persistent.Address;
 import com.enhide.repositories.EmailRepository;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -44,235 +45,226 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Service
 public class EmailService {
 
-	@Value(value = "${mailgun.key}")
-	private String key;
+  @Value(value = "${mailgun.key}")
+  private String key;
 
-	@Value(value = "${mailgun.resource}")
-	private String resource;
+  @Value(value = "${mailgun.resource}")
+  private String resource;
 
-	@Autowired
-	private EmailRepository emailRepository;
+  @Autowired
+  private EmailRepository emailRepository;
 
-	public ClientResponse sendEncryptedMime(Email email)
-		throws IOException, ParseException {
-		Client client = Client.create();
-		client.addFilter(new HTTPBasicAuthFilter("api", key));
-		WebResource webResource = client.resource(resource);
-		FormDataMultiPart form = new FormDataMultiPart();
-		InputStream inputStream = createEncryptedMime(
-			email.getFroms(),
-			email.getTos(),
-			email.getCcs(),
-			email.getBccs(),
-			email.getSubject(),
-			email.getMessage());
-		for (Address to : email.getTos()) {
-			form.field("to", to.getValue());
-		}
-		form.bodyPart(new StreamDataBodyPart("message", inputStream));
-		ClientResponse post = webResource
-			.type(MediaType.MULTIPART_FORM_DATA_TYPE)
-			.post(ClientResponse.class, form);
-		if (post.getStatus() == 200) {
-			emailRepository.save(email);
-		}
-		return post;
-	}
+  public ClientResponse send(Email email) throws IOException, ParseException, Exception {
+    Client client = Client.create();
+    client.addFilter(new HTTPBasicAuthFilter("api", key));
+    WebResource webResource = client.resource(resource);
+    FormDataMultiPart form = new FormDataMultiPart();
+    InputStream inputStream = null;
+    String message = email.getMessage();
+    String clearText = email.getClearText();
+    String signature = email.getSignature();
+    if (StringUtils.isNotBlank(message)) {
+      inputStream = createEncryptedMime(
+              email.getFroms(),
+              email.getTos(),
+              email.getCcs(),
+              email.getBccs(),
+              email.getSubject(),
+              message);
+    } else if (StringUtils.isNotBlank(clearText)
+            && StringUtils.isNotBlank(signature)) {
+      inputStream = createSignedMime(
+              email.getFroms(),
+              email.getTos(),
+              email.getCcs(),
+              email.getBccs(),
+              email.getSubject(),
+              clearText,
+              signature);
+    } else {
+      throw new Exception(
+              "Sorry we do not allow the sending of unsigned cleartext emails. ");
+    }
 
-	public ClientResponse sendSignedMime(
-		Email email
-	) throws IOException, ParseException {
-		Client client = Client.create();
-		client.addFilter(new HTTPBasicAuthFilter("api", key));
-		WebResource webResource = client.resource(resource);
-		FormDataMultiPart form = new FormDataMultiPart();
-		InputStream inputStream = createSignedMime(
-			email.getFroms(),
-			email.getTos(),
-			email.getCcs(),
-			email.getBccs(),
-			email.getSubject(),
-			email.getClearText(),
-			email.getSignature());
-		for (Address to : email.getTos()) {
-			form.field("to", to.getValue());
-		}
-		form.bodyPart(new StreamDataBodyPart("message", inputStream));
-		ClientResponse post = webResource
-			.type(MediaType.MULTIPART_FORM_DATA_TYPE)
-			.post(ClientResponse.class, form);
-		if (post.getStatus() == 200) {
-			emailRepository.save(email);
-		}
-		return post;
-	}
+    for (Address to : email.getTos()) {
+      form.field("to", to.getValue());
+    }
+    form.bodyPart(new StreamDataBodyPart("message", inputStream));
+    ClientResponse post = webResource
+            .type(MediaType.MULTIPART_FORM_DATA_TYPE)
+            .post(ClientResponse.class, form);
+    if (post.getStatus() == 200) {
+      emailRepository.save(email);
+    }
+    return post;
+  }
 
-	private InputStream createEncryptedMime(
-		Set<Address> froms,
-		Set<Address> tos,
-		Set<Address> ccs,
-		Set<Address> bccs,
-		String subject,
-		String encrypted
-	) throws IOException, ParseException {
-		MessageBuilder builder = new DefaultMessageBuilder();
-		Message message = builder.newMessage();
-		{
-			Header header = builder.newHeader();
-			{
-				AddressBuilder addressBuilder = AddressBuilder.DEFAULT;
-				for (Address from : froms) {
-					header.addField(Fields.from(addressBuilder.parseMailbox(from.getValue())));
-				}
-				for (Address to : tos) {
-					header.addField(Fields.to(addressBuilder.parseAddress(to.getValue())));
-				}
-				for (Address cc : ccs) {
-					header.addField(Fields.cc(addressBuilder.parseAddress(cc.getValue())));
-				}
-				for (Address bcc : bccs) {
-					header.addField(Fields.bcc(addressBuilder.parseAddress(bcc.getValue())));
-				}
-				header.addField(Fields.subject(subject));
-				Map<String, String> map = new HashMap<>();
-				map.put("protocol", "application/pgp-encrypted");
-				map.put("boundary", "lICdWpALSxNuvFoHT9h2kd6OuMwufkLpT");
-				header.addField(Fields.contentType("multipart/encrypted", map));
-				message.setHeader(header);
-			}
-			Multipart multipart = builder.newMultipart("");
-			{
-				multipart.setPreamble("This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)");
-				BodyPart version = new BodyPart();
-				{
-					Header versionHeader = builder.newHeader();
-					versionHeader.addField(Fields.contentType("application/pgp-encrypted"));
-					version.setHeader(versionHeader);
-					version.setBody(new SingleBody() {
-						@Override
-						public InputStream getInputStream() throws IOException {
-							return new ByteArrayInputStream("Version: 1".getBytes(StandardCharsets.US_ASCII));
-						}
-					});
-					multipart.addBodyPart(version);
-				}
-				BodyPart octets = new BodyPart();
-				{
-					Header octetHeader = builder.newHeader();
-					Map<String, String> octetMap = new HashMap<>();
-					octetMap.put("name", "encrypted.asc");
-					octetHeader.addField(Fields.contentType("application/octet-stream", octetMap));
-					Map<String, String> dispositionMap = new HashMap<>();
-					dispositionMap.put("filename", "encrypted.asc");
-					octetHeader.addField(Fields.contentDisposition("inline", octetMap));
-					octets.setHeader(octetHeader);
-					octets.setBody(new SingleBody() {
-						@Override
-						public InputStream getInputStream() throws IOException {
-							return new ByteArrayInputStream(encrypted.getBytes(StandardCharsets.US_ASCII));
-						}
-					});
-					multipart.addBodyPart(octets);
-				}
-			}
-			multipart.setParent(message);
-			message.setBody(multipart);
-			MessageWriter writer = new DefaultMessageWriter();
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			writer.writeMessage(message, outputStream);
-			return new ByteArrayInputStream(outputStream.toByteArray());
-		}
-	}
+  private InputStream createEncryptedMime(
+          Set<Address> froms,
+          Set<Address> tos,
+          Set<Address> ccs,
+          Set<Address> bccs,
+          String subject,
+          String encrypted
+  ) throws IOException, ParseException {
+    MessageBuilder builder = new DefaultMessageBuilder();
+    Message message = builder.newMessage();
+    {
+      Header header = builder.newHeader();
+      {
+        AddressBuilder addressBuilder = AddressBuilder.DEFAULT;
+        for (Address from : froms) {
+          header.addField(Fields.from(addressBuilder.parseMailbox(from.getValue())));
+        }
+        for (Address to : tos) {
+          header.addField(Fields.to(addressBuilder.parseAddress(to.getValue())));
+        }
+        for (Address cc : ccs) {
+          header.addField(Fields.cc(addressBuilder.parseAddress(cc.getValue())));
+        }
+        for (Address bcc : bccs) {
+          header.addField(Fields.bcc(addressBuilder.parseAddress(bcc.getValue())));
+        }
+        header.addField(Fields.subject(subject));
+        Map<String, String> map = new HashMap<>();
+        map.put("protocol", "application/pgp-encrypted");
+        map.put("boundary", "lICdWpALSxNuvFoHT9h2kd6OuMwufkLpT");
+        header.addField(Fields.contentType("multipart/encrypted", map));
+        message.setHeader(header);
+      }
+      Multipart multipart = builder.newMultipart("");
+      {
+        multipart.setPreamble("This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)");
+        BodyPart version = new BodyPart();
+        {
+          Header versionHeader = builder.newHeader();
+          versionHeader.addField(Fields.contentType("application/pgp-encrypted"));
+          version.setHeader(versionHeader);
+          version.setBody(new SingleBody() {
+            @Override
+            public InputStream getInputStream() throws IOException {
+              return new ByteArrayInputStream("Version: 1".getBytes(StandardCharsets.US_ASCII));
+            }
+          });
+          multipart.addBodyPart(version);
+        }
+        BodyPart octets = new BodyPart();
+        {
+          Header octetHeader = builder.newHeader();
+          Map<String, String> octetMap = new HashMap<>();
+          octetMap.put("name", "encrypted.asc");
+          octetHeader.addField(Fields.contentType("application/octet-stream", octetMap));
+          Map<String, String> dispositionMap = new HashMap<>();
+          dispositionMap.put("filename", "encrypted.asc");
+          octetHeader.addField(Fields.contentDisposition("inline", octetMap));
+          octets.setHeader(octetHeader);
+          octets.setBody(new SingleBody() {
+            @Override
+            public InputStream getInputStream() throws IOException {
+              return new ByteArrayInputStream(encrypted.getBytes(StandardCharsets.US_ASCII));
+            }
+          });
+          multipart.addBodyPart(octets);
+        }
+      }
+      multipart.setParent(message);
+      message.setBody(multipart);
+      MessageWriter writer = new DefaultMessageWriter();
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      writer.writeMessage(message, outputStream);
+      return new ByteArrayInputStream(outputStream.toByteArray());
+    }
+  }
 
-	private ByteArrayInputStream createSignedMime(
-		Set<Address> froms,
-		Set<Address> tos,
-		Set<Address> ccs,
-		Set<Address> bccs,
-		String subject,
-		String clearText,
-		String signature) throws IOException, ParseException {
-		MessageBuilder builder = new DefaultMessageBuilder();
-		Message message = builder.newMessage();
-		{
-			Header header = builder.newHeader();
-			{
-				AddressBuilder addressBuilder = AddressBuilder.DEFAULT;
-				for (Address from : froms) {
-					header.addField(Fields.from(addressBuilder.parseMailbox(from.getValue())));
-				}
-				for (Address to : tos) {
-					header.addField(Fields.to(addressBuilder.parseAddress(to.getValue())));
-				}
-				for (Address cc : ccs) {
-					header.addField(Fields.cc(addressBuilder.parseAddress(cc.getValue())));
-				}
-				for (Address bcc : bccs) {
-					header.addField(Fields.bcc(addressBuilder.parseAddress(bcc.getValue())));
-				}
-				header.addField(Fields.subject(subject));
-				Map<String, String> map = new HashMap<>();
-				map.put("micalg", "pgp-sha256");
-				map.put("protocol", "application/pgp-signature");
-				map.put("boundary", "UBFBPcp4fjBXlbJE0rkpJs89BT9lk0OxI");
-				header.addField(Fields.contentType("multipart/signed", map));
-				message.setHeader(header);
-			}
-			Multipart multipart = builder.newMultipart("");
-			{
-				multipart.setPreamble("This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)");
-				BodyPart plainText = new BodyPart();
-				{
-					Header plainTextHeader = builder.newHeader();
-					Map<String, String> map = new HashMap<>();
-					map.put("charset", "utf-8");
-					plainTextHeader.addField(Fields.contentType("text/plain", map));
-					plainTextHeader.addField(Fields.contentTransferEncoding("quoted-printable"));
-					plainText.setHeader(plainTextHeader);
-					plainText.setBody(new TextBody() {
+  private ByteArrayInputStream createSignedMime(
+          Set<Address> froms,
+          Set<Address> tos,
+          Set<Address> ccs,
+          Set<Address> bccs,
+          String subject,
+          String clearText,
+          String signature) throws IOException, ParseException {
+    MessageBuilder builder = new DefaultMessageBuilder();
+    Message message = builder.newMessage();
+    {
+      Header header = builder.newHeader();
+      {
+        AddressBuilder addressBuilder = AddressBuilder.DEFAULT;
+        for (Address from : froms) {
+          header.addField(Fields.from(addressBuilder.parseMailbox(from.getValue())));
+        }
+        for (Address to : tos) {
+          header.addField(Fields.to(addressBuilder.parseAddress(to.getValue())));
+        }
+        for (Address cc : ccs) {
+          header.addField(Fields.cc(addressBuilder.parseAddress(cc.getValue())));
+        }
+        for (Address bcc : bccs) {
+          header.addField(Fields.bcc(addressBuilder.parseAddress(bcc.getValue())));
+        }
+        header.addField(Fields.subject(subject));
+        Map<String, String> map = new HashMap<>();
+        map.put("micalg", "pgp-sha256");
+        map.put("protocol", "application/pgp-signature");
+        map.put("boundary", "UBFBPcp4fjBXlbJE0rkpJs89BT9lk0OxI");
+        header.addField(Fields.contentType("multipart/signed", map));
+        message.setHeader(header);
+      }
+      Multipart multipart = builder.newMultipart("");
+      {
+        multipart.setPreamble("This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)");
+        BodyPart plainText = new BodyPart();
+        {
+          Header plainTextHeader = builder.newHeader();
+          Map<String, String> map = new HashMap<>();
+          map.put("charset", "utf-8");
+          plainTextHeader.addField(Fields.contentType("text/plain", map));
+          plainTextHeader.addField(Fields.contentTransferEncoding("quoted-printable"));
+          plainText.setHeader(plainTextHeader);
+          plainText.setBody(new TextBody() {
 
-						@Override
-						public String getMimeCharset() {
-							return StandardCharsets.UTF_8.name();
-						}
+            @Override
+            public String getMimeCharset() {
+              return StandardCharsets.UTF_8.name();
+            }
 
-						@Override
-						public Reader getReader() throws IOException {
-							return new StringReader(clearText);
-						}
+            @Override
+            public Reader getReader() throws IOException {
+              return new StringReader(clearText);
+            }
 
-						@Override
-						public InputStream getInputStream() throws IOException {
-							return new ByteArrayInputStream(clearText.getBytes(StandardCharsets.UTF_8));
-						}
-					});
-					multipart.addBodyPart(plainText);
-				}
-				BodyPart octets = new BodyPart();
-				{
-					Header octetHeader = builder.newHeader();
-					Map<String, String> octetMap = new HashMap<>();
-					octetMap.put("name", "signature.asc");
-					octetHeader.addField(Fields.contentType("application/pgp-signature", octetMap));
-					Map<String, String> dispositionMap = new HashMap<>();
-					dispositionMap.put("filename", "signature.asc");
-					octetHeader.addField(Fields.contentDisposition("attachment", octetMap));
-					octets.setHeader(octetHeader);
-					octets.setBody(new SingleBody() {
-						@Override
-						public InputStream getInputStream() throws IOException {
-							return new ByteArrayInputStream(signature.getBytes(StandardCharsets.US_ASCII));
-						}
-					});
-					multipart.addBodyPart(octets);
-				}
-			}
-			multipart.setParent(message);
-			message.setBody(multipart);
-			MessageWriter writer = new DefaultMessageWriter();
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			writer.writeMessage(message, outputStream);
-			return new ByteArrayInputStream(outputStream.toByteArray());
-		}
-	}
+            @Override
+            public InputStream getInputStream() throws IOException {
+              return new ByteArrayInputStream(clearText.getBytes(StandardCharsets.UTF_8));
+            }
+          });
+          multipart.addBodyPart(plainText);
+        }
+        BodyPart octets = new BodyPart();
+        {
+          Header octetHeader = builder.newHeader();
+          Map<String, String> octetMap = new HashMap<>();
+          octetMap.put("name", "signature.asc");
+          octetHeader.addField(Fields.contentType("application/pgp-signature", octetMap));
+          Map<String, String> dispositionMap = new HashMap<>();
+          dispositionMap.put("filename", "signature.asc");
+          octetHeader.addField(Fields.contentDisposition("attachment", octetMap));
+          octets.setHeader(octetHeader);
+          octets.setBody(new SingleBody() {
+            @Override
+            public InputStream getInputStream() throws IOException {
+              return new ByteArrayInputStream(signature.getBytes(StandardCharsets.US_ASCII));
+            }
+          });
+          multipart.addBodyPart(octets);
+        }
+      }
+      multipart.setParent(message);
+      message.setBody(multipart);
+      MessageWriter writer = new DefaultMessageWriter();
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      writer.writeMessage(message, outputStream);
+      return new ByteArrayInputStream(outputStream.toByteArray());
+    }
+  }
 }

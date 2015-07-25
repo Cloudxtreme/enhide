@@ -31,7 +31,7 @@ public class EmailServiceTest {
 	private EmailService emailService;
 
 	@Test
-	public void testSendMimeMessage() throws IOException, ParseException {
+	public void testSendMimeMessage() throws IOException, ParseException, Exception {
 		String pgp = "-----BEGIN PGP MESSAGE-----\n"
 			+ "Version: GnuPG v2\n"
 			+ "\n"
@@ -72,12 +72,12 @@ public class EmailServiceTest {
 		email.setSubject("multipart/encrypted Test");
 		email.setMessage(pgp);
 
-		ClientResponse sendMimeMessage = emailService.sendEncryptedMime(email);
+		ClientResponse sendMimeMessage = emailService.send(email);
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
 
 	@Test
-	public void testSendSignedMime() throws IOException, ParseException {
+	public void testSendSignedMime() throws IOException, ParseException, Exception {
 		String clearText = "Hi, I'm Testing signed unencrypted PGP/MIME\n"
 			+ "\n"
 			+ "Edwin\n\n";
@@ -117,7 +117,7 @@ public class EmailServiceTest {
 		email.setClearText(clearText);
 		email.setSignature(pgp);
 
-		ClientResponse sendMimeMessage = emailService.sendSignedMime(email);
+		ClientResponse sendMimeMessage = emailService.send(email);
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
 
