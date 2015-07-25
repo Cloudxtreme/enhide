@@ -2,7 +2,9 @@ package com.enhide.services;
 
 import com.enhide.Main;
 import com.enhide.models.persistent.Address;
+import com.enhide.models.persistent.Body;
 import com.enhide.models.persistent.Email;
+import com.enhide.models.transitory.SendRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import java.io.IOException;
 import java.util.Arrays;
@@ -30,7 +32,7 @@ public class EmailServiceTest {
 	@Autowired
 	private EmailService emailService;
 
-//	@Test
+	@Test
 	public void testSendMimeMessage() throws IOException, ParseException, Exception {
 		String pgp = "-----BEGIN PGP MESSAGE-----\n"
 			+ "Version: GnuPG v2\n"
@@ -64,19 +66,21 @@ public class EmailServiceTest {
 		Set<Address> bccs = new HashSet<>();
 		bccs.addAll((Collection<Address>) Arrays.asList(new Address[]{}));
 
+		SendRequest sendRequest = new SendRequest();
 		Email email = new Email();
 		email.setFroms(froms);
 		email.setTos(tos);
 		email.setCcs(ccs);
 		email.setBccs(bccs);
 		email.setSubject("multipart/encrypted Test");
-		email.setMessage(pgp);
+		sendRequest.setEmail(email);
+		sendRequest.setMessage(pgp);
 
-		ClientResponse sendMimeMessage = emailService.send(email);
+		ClientResponse sendMimeMessage = emailService.send(sendRequest);
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
 
-//	@Test
+	@Test
 	public void testSendSignedMime() throws IOException, ParseException, Exception {
 		String clearText = "Hi, I'm Testing signed unencrypted PGP/MIME\n"
 			+ "\n"
@@ -108,16 +112,18 @@ public class EmailServiceTest {
 		Set<Address> bccs = new HashSet<>();
 		bccs.addAll((Collection<Address>) Arrays.asList(new Address[]{}));
 
+		SendRequest sendRequest = new SendRequest();
 		Email email = new Email();
 		email.setFroms(froms);
 		email.setTos(tos);
 		email.setCcs(ccs);
 		email.setBccs(bccs);
 		email.setSubject("multipart/signed Test");
-		email.setClearText(clearText);
-		email.setSignature(pgp);
+		sendRequest.setEmail(email);
+		sendRequest.setClearText(clearText);
+		sendRequest.setSignature(pgp);
 
-		ClientResponse sendMimeMessage = emailService.send(email);
+		ClientResponse sendMimeMessage = emailService.send(sendRequest);
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
 

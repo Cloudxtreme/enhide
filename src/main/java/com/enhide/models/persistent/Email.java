@@ -1,6 +1,8 @@
 package com.enhide.models.persistent;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,10 +14,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -57,22 +59,14 @@ public class Email extends Base {
 		@JoinColumn(name = "address_id")})
 	private Set<Address> bccs = new HashSet<Address>();
 
-	@NotEmpty
 	private String subject;
 
-	@Lob
-	private String message;
-
-	@Lob
-	private String clearText;
-
-	@Lob
-	private String signature;
-
-	@Lob
-	private String other;
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JsonIgnore
+	private Body body;
 
 	@ManyToOne
+	@JsonIgnore
 	private Email replyTo;
 
 	@OneToMany(mappedBy = "replyTo")
@@ -142,35 +136,13 @@ public class Email extends Base {
 		this.subject = subject;
 	}
 
-	public String getMessage() {
-		return message;
+	@JsonProperty
+	public Body getBody() {
+		return body;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public String getClearText() {
-		return clearText;
-	}
-
-	public void setClearText(String clearText) {
-		this.clearText = clearText;
-	}
-
-	public String getSignature() {
-		return signature;
-	}
-
-	public void setSignature(String signature) {
-		this.signature = signature;
-	}
-
-	public String getOther() {
-		return other;
-	}
-
-	public void setOther(String other) {
-		this.other = other;
+	@JsonIgnore
+	public void setBody(Body body) {
+		this.body = body;
 	}
 }
