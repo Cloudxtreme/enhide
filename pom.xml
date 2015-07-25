@@ -126,10 +126,11 @@
 					<driver>liquibase.ext.hibernate.database.connection.HibernateDriver</driver>
 					<url>hibernate:spring:com.enhide.models.persistent?dialect=org.hibernate.dialect.PostgreSQLDialect&amp;hibernate.ejb.naming_strategy=org.hibernate.cfg.ImprovedNamingStrategy</url>
 					<outputChangeLogFile>src/main/resources/db/changelog/schema.xml</outputChangeLogFile>
+					<liquibaseShouldRun>false</liquibaseShouldRun>
 				</configuration>
 				<executions>
 					<execution>
-						<phase>validate</phase>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>generateChangeLog</goal>
 						</goals>
