@@ -117,6 +117,52 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>3.4.0</version>
+				<configuration>
+					<changeSetAuthor>edwin</changeSetAuthor>
+					<driver>liquibase.ext.hibernate.database.connection.HibernateDriver</driver>
+					<url>hibernate:spring:com.enhide.models.persistent?dialect=org.hibernate.dialect.PostgreSQLDialect&amp;hibernate.ejb.naming_strategy=org.hibernate.cfg.ImprovedNamingStrategy</url>
+					<outputChangeLogFile>src/main/resources/db/changelog/schema.xml</outputChangeLogFile>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>generateChangeLog</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.liquibase.ext</groupId>
+						<artifactId>liquibase-hibernate4</artifactId>
+						<version>3.5</version>
+					</dependency>
+					<dependency>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+						<version>4.1.7.RELEASE</version>
+					</dependency>
+					<dependency>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-orm</artifactId>
+						<version>4.1.7.RELEASE</version>
+					</dependency>
+					<dependency>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context</artifactId>
+						<version>4.1.7.RELEASE</version>
+					</dependency>
+					<dependency>
+						<groupId>com.enhide</groupId>
+						<artifactId>enhide</artifactId>
+						<version>0.0.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 </project>
