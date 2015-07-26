@@ -39,6 +39,7 @@ import com.enhide.models.transitory.SendRequest;
 import com.enhide.repositories.EmailRepository;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -58,7 +59,7 @@ public class EmailService {
 	@Autowired
 	private EmailRepository emailRepository;
 
-	public ClientResponse send(SendRequest sendRequest) throws IOException, ParseException, Exception {
+	public Pair<ClientResponse, Email> send(SendRequest sendRequest) throws IOException, ParseException, Exception {
 		Email email = sendRequest.getEmail();
 		Assert.notNull(email, "Cannot send blank email");
 		Client client = Client.create();
@@ -99,14 +100,16 @@ public class EmailService {
 		ClientResponse post = webResource
 			.type(MediaType.MULTIPART_FORM_DATA_TYPE)
 			.post(ClientResponse.class, form);
+		Email saved = null;
 		if (post.getStatus() == 200) {
 			String value = IOUtils.toString(inputStream);
 			Body body = new Body();
 			body.setValue(value);
+			body.setEmail(email);
 			email.setBody(body);
-			emailRepository.save(email);
+			saved = emailRepository.save(email);
 		}
-		return post;
+		return Pair.of(post, saved);
 	}
 
 	private InputStream createEncryptedMime(

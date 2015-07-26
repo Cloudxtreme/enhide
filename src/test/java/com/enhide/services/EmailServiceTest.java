@@ -5,12 +5,16 @@ import com.enhide.models.persistent.Address;
 import com.enhide.models.persistent.Body;
 import com.enhide.models.persistent.Email;
 import com.enhide.models.transitory.SendRequest;
+import com.enhide.repositories.BodyRepository;
+import com.enhide.repositories.EmailRepository;
 import com.sun.jersey.api.client.ClientResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +36,13 @@ public class EmailServiceTest {
 	@Autowired
 	private EmailService emailService;
 
-//	@Test
+	@Autowired
+	private BodyRepository bodyRepository;
+
+	@Autowired
+	private EmailRepository emailRepository;
+
+	@Test
 	public void testSendMimeMessage() throws IOException, ParseException, Exception {
 		String pgp = "-----BEGIN PGP MESSAGE-----\n"
 			+ "Version: GnuPG v2\n"
@@ -76,11 +86,18 @@ public class EmailServiceTest {
 		sendRequest.setEmail(email);
 		sendRequest.setMessage(pgp);
 
-		ClientResponse sendMimeMessage = emailService.send(sendRequest);
-		Assert.isTrue(sendMimeMessage.getStatus() == 200);
+		Pair<ClientResponse, Email> pair = emailService.send(sendRequest);
+		ClientResponse clientResponse = pair.getLeft();
+		Email saved = pair.getRight();
+		Assert.isTrue(clientResponse.getStatus() == 200);
+		Email findOne = emailRepository.findOne(saved.getId());
+		Body findByEmail = bodyRepository.findByEmail(saved.getId());
+		Assert.isTrue(findOne != null);
+		Assert.isTrue(findByEmail != null);
+//		Assert.isTrue(StringUtils.equals(findOne.getBody().getValue(), findByEmail.getValue()));
 	}
 
-//	@Test
+	@Test
 	public void testSendSignedMime() throws IOException, ParseException, Exception {
 		String clearText = "Hi, I'm Testing signed unencrypted PGP/MIME\n"
 			+ "\n"
@@ -123,8 +140,15 @@ public class EmailServiceTest {
 		sendRequest.setClearText(clearText);
 		sendRequest.setSignature(pgp);
 
-		ClientResponse sendMimeMessage = emailService.send(sendRequest);
-		Assert.isTrue(sendMimeMessage.getStatus() == 200);
+		Pair<ClientResponse, Email> pair = emailService.send(sendRequest);
+		ClientResponse clientResponse = pair.getLeft();
+		Email saved = pair.getRight();
+		Assert.isTrue(clientResponse.getStatus() == 200);
+		Email findOne = emailRepository.findOne(saved.getId());
+		Body findByEmail = bodyRepository.findByEmail(saved.getId());
+		Assert.isTrue(findOne != null);
+		Assert.isTrue(findByEmail != null);
+//		Assert.isTrue(StringUtils.equals(findOne.getBody().getValue(), findByEmail.getValue()));
 	}
 
 	@Test
