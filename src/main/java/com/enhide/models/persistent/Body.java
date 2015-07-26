@@ -1,12 +1,16 @@
 package com.enhide.models.persistent;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -23,6 +27,10 @@ public class Body extends Base {
 	@Lob
 	private String value;
 
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JsonIgnore
+	private Email email;
+
 	public Long getId() {
 		return id;
 	}
@@ -37,5 +45,13 @@ public class Body extends Base {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public Email getEmail() {
+		return email;
+	}
+
+	public void setEmail(Email email) {
+		this.email = email;
 	}
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
-    <changeSet author="edwin" id="1437848209244-1">
+    <changeSet author="edwin" id="1437919800969-1">
         <createSequence sequenceName="hibernate_sequence"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-2">
+    <changeSet author="edwin" id="1437919800969-2">
         <createTable tableName="address">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="addressPK"/>
@@ -12,7 +12,7 @@
             <column name="user" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-3">
+    <changeSet author="edwin" id="1437919800969-3">
         <createTable tableName="body">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="bodyPK"/>
@@ -23,9 +23,10 @@
                 <constraints nullable="false"/>
             </column>
             <column name="value" type="CLOB"/>
+            <column name="email" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-4">
+    <changeSet author="edwin" id="1437919800969-4">
         <createTable tableName="captcha">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="captchaPK"/>
@@ -39,7 +40,7 @@
             <column name="solution" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-5">
+    <changeSet author="edwin" id="1437919800969-5">
         <createTable tableName="email">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="emailPK"/>
@@ -54,7 +55,7 @@
             <column name="reply_to" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-6">
+    <changeSet author="edwin" id="1437919800969-6">
         <createTable tableName="email_address">
             <column name="email_id" type="BIGINT">
                 <constraints nullable="false"/>
@@ -64,7 +65,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-7">
+    <changeSet author="edwin" id="1437919800969-7">
         <createTable tableName="role">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints primaryKey="true" primaryKeyName="rolePK"/>
@@ -77,7 +78,7 @@
             <column name="name" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-8">
+    <changeSet author="edwin" id="1437919800969-8">
         <createTable tableName="user">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints primaryKey="true" primaryKeyName="userPK"/>
@@ -94,7 +95,7 @@
             <column name="password" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-9">
+    <changeSet author="edwin" id="1437919800969-9">
         <createTable tableName="user_addresses">
             <column name="user" type="INT">
                 <constraints nullable="false"/>
@@ -104,7 +105,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-10">
+    <changeSet author="edwin" id="1437919800969-10">
         <createTable tableName="user_role">
             <column name="user_id" type="INT">
                 <constraints nullable="false"/>
@@ -114,46 +115,49 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-11">
+    <changeSet author="edwin" id="1437919800969-11">
         <addPrimaryKey columnNames="address_id, email_id" tableName="email_address"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-12">
+    <changeSet author="edwin" id="1437919800969-12">
         <addPrimaryKey columnNames="user, addresses" tableName="user_addresses"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-13">
+    <changeSet author="edwin" id="1437919800969-13">
         <addPrimaryKey columnNames="user_id, role_id" tableName="user_role"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-14">
+    <changeSet author="edwin" id="1437919800969-14">
         <addUniqueConstraint columnNames="addresses" tableName="user_addresses"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-15">
+    <changeSet author="edwin" id="1437919800969-15">
         <addUniqueConstraint columnNames="login" constraintName="UC_USERLOGIN_COL" tableName="user"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-16">
+    <changeSet author="edwin" id="1437919800969-16">
         <addForeignKeyConstraint baseColumnNames="reply_to" baseTableName="email" constraintName="FK_50we9uv7qb3u67ma8hg7o25sw" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="email"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-17">
+    <changeSet author="edwin" id="1437919800969-17">
         <addForeignKeyConstraint baseColumnNames="email_id" baseTableName="email_address" constraintName="FK_7cykuq7yggck767qjisysraik" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="email"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-18">
+    <changeSet author="edwin" id="1437919800969-18">
         <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_role" constraintName="FK_apcc8lxk2xnug8377fatvbn04" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-19">
+    <changeSet author="edwin" id="1437919800969-19">
+        <addForeignKeyConstraint baseColumnNames="email" baseTableName="body" constraintName="FK_g3yxl35l9qriqlp4th4utqd6n" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="email"/>
+    </changeSet>
+    <changeSet author="edwin" id="1437919800969-20">
         <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="user_role" constraintName="FK_it77eq964jhfqtu54081ebtio" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="role"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-20">
+    <changeSet author="edwin" id="1437919800969-21">
         <addForeignKeyConstraint baseColumnNames="body" baseTableName="email" constraintName="FK_kd7fo1eyb33lqer2cjh1jr4w2" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="body"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-21">
+    <changeSet author="edwin" id="1437919800969-22">
         <addForeignKeyConstraint baseColumnNames="user" baseTableName="address" constraintName="FK_m0cmdw9324e5ydmrectvlq4an" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-22">
+    <changeSet author="edwin" id="1437919800969-23">
         <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="email_address" constraintName="FK_mj6ypvcwd5i0cs4b8xqpa2ya1" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="address"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-23">
+    <changeSet author="edwin" id="1437919800969-24">
         <addForeignKeyConstraint baseColumnNames="addresses" baseTableName="user_addresses" constraintName="FK_n8f9qysd73j73b8m3g2xe6jr9" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="address"/>
     </changeSet>
-    <changeSet author="edwin" id="1437848209244-24">
+    <changeSet author="edwin" id="1437919800969-25">
         <addForeignKeyConstraint baseColumnNames="user" baseTableName="user_addresses" constraintName="FK_p12t376akrgdqg1phc4fl2m5q" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
 </databaseChangeLog>

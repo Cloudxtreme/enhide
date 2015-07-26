@@ -32,7 +32,7 @@ public class EmailServiceTest {
 	@Autowired
 	private EmailService emailService;
 
-	@Test
+//	@Test
 	public void testSendMimeMessage() throws IOException, ParseException, Exception {
 		String pgp = "-----BEGIN PGP MESSAGE-----\n"
 			+ "Version: GnuPG v2\n"
@@ -80,7 +80,7 @@ public class EmailServiceTest {
 		Assert.isTrue(sendMimeMessage.getStatus() == 200);
 	}
 
-	@Test
+//	@Test
 	public void testSendSignedMime() throws IOException, ParseException, Exception {
 		String clearText = "Hi, I'm Testing signed unencrypted PGP/MIME\n"
 			+ "\n"
