@@ -86,7 +86,7 @@ public class EmailServiceTest {
 		sendRequest.setEmail(email);
 		sendRequest.setMessage(pgp);
 
-		Pair<ClientResponse, Email> pair = emailService.send(sendRequest);
+		Pair<ClientResponse, Email> pair = emailService.send(sendRequest, true);
 		ClientResponse clientResponse = pair.getLeft();
 		Email saved = pair.getRight();
 		Assert.isTrue(clientResponse.getStatus() == 200);
@@ -140,7 +140,7 @@ public class EmailServiceTest {
 		sendRequest.setClearText(clearText);
 		sendRequest.setSignature(pgp);
 
-		Pair<ClientResponse, Email> pair = emailService.send(sendRequest);
+		Pair<ClientResponse, Email> pair = emailService.send(sendRequest, true);
 		ClientResponse clientResponse = pair.getLeft();
 		Email saved = pair.getRight();
 		Assert.isTrue(clientResponse.getStatus() == 200);

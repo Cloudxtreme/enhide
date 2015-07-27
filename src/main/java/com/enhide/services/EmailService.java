@@ -59,7 +59,7 @@ public class EmailService {
 	@Autowired
 	private EmailRepository emailRepository;
 
-	public Pair<ClientResponse, Email> send(SendRequest sendRequest) throws IOException, ParseException, Exception {
+	public Pair<ClientResponse, Email> send(SendRequest sendRequest, boolean isTest) throws IOException, ParseException, Exception {
 		Email email = sendRequest.getEmail();
 		Assert.notNull(email, "Cannot send blank email");
 		Client client = Client.create();
@@ -70,6 +70,7 @@ public class EmailService {
 		String message = sendRequest.getMessage();
 		String clearText = sendRequest.getClearText();
 		String signature = sendRequest.getSignature();
+
 		if (StringUtils.isNotBlank(message)) {
 			inputStream = createEncryptedMime(
 				email.getFroms(),
@@ -96,6 +97,11 @@ public class EmailService {
 		for (Address to : email.getTos()) {
 			form.field("to", to.getValue());
 		}
+
+		if (isTest) {
+			form.field("o:testmode", "true");
+		}
+
 		form.bodyPart(new StreamDataBodyPart("message", inputStream));
 		ClientResponse post = webResource
 			.type(MediaType.MULTIPART_FORM_DATA_TYPE)
