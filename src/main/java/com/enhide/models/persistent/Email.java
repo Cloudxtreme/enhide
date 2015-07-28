@@ -16,6 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -25,6 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author sales@enhide.com
  */
 @Entity
+@NamedEntityGraph(name = "Email.withBody", attributeNodes = @NamedAttributeNode("body"))
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@objectId")
 public class Email extends Base {
 

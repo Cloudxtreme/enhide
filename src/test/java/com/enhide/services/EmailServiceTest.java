@@ -94,7 +94,7 @@ public class EmailServiceTest {
 		Body findByEmail = bodyRepository.findByEmail(saved.getId());
 		Assert.isTrue(findOne != null);
 		Assert.isTrue(findByEmail != null);
-//		Assert.isTrue(StringUtils.equals(findOne.getBody().getValue(), findByEmail.getValue()));
+		Assert.isTrue(StringUtils.equals(findOne.getBody().getValue(), findByEmail.getValue()));
 	}
 
 	@Test
@@ -148,7 +148,7 @@ public class EmailServiceTest {
 		Body findByEmail = bodyRepository.findByEmail(saved.getId());
 		Assert.isTrue(findOne != null);
 		Assert.isTrue(findByEmail != null);
-//		Assert.isTrue(StringUtils.equals(findOne.getBody().getValue(), findByEmail.getValue()));
+		Assert.isTrue(StringUtils.equals(findOne.getBody().getValue(), findByEmail.getValue()));
 	}
 
 	@Test
