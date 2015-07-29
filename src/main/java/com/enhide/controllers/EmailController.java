@@ -20,7 +20,7 @@ public class EmailController {
 	private EmailService emailService;
 
 	@RequestMapping("/inbox")
-	public List<Email> greeting(@AuthenticationPrincipal User user) {
+	public List<Email> inbox(@AuthenticationPrincipal User user) {
     return emailService.inbox(user);
 	}
 }
