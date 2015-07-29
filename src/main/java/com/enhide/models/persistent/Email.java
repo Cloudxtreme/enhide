@@ -36,7 +36,7 @@ public class Email extends Base {
 	private Long id;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	@JoinTable(name = "email_address", joinColumns = {
+	@JoinTable(name = "from_address", joinColumns = {
 		@JoinColumn(name = "email_id")}, inverseJoinColumns = {
 		@JoinColumn(name = "address_id")})
 	@NotEmpty
@@ -44,20 +44,20 @@ public class Email extends Base {
 	//http://serverfault.com/questions/554520/smtp-allows-for-multiple-from-addresses-in-the-rfc-was-this-ever-useful-why-do
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	@JoinTable(name = "email_address", joinColumns = {
+	@JoinTable(name = "to_address", joinColumns = {
 		@JoinColumn(name = "email_id")}, inverseJoinColumns = {
 		@JoinColumn(name = "address_id")})
 	@NotEmpty
 	private Set<Address> tos = new HashSet<Address>();
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	@JoinTable(name = "email_address", joinColumns = {
+	@JoinTable(name = "cc_address", joinColumns = {
 		@JoinColumn(name = "email_id")}, inverseJoinColumns = {
 		@JoinColumn(name = "address_id")})
 	private Set<Address> ccs = new HashSet<Address>();
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	@JoinTable(name = "email_address", joinColumns = {
+	@JoinTable(name = "bcc_address", joinColumns = {
 		@JoinColumn(name = "email_id")}, inverseJoinColumns = {
 		@JoinColumn(name = "address_id")})
 	private Set<Address> bccs = new HashSet<Address>();

@@ -35,8 +35,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.enhide.models.persistent.Address;
 import com.enhide.models.persistent.Body;
+import com.enhide.models.persistent.User;
 import com.enhide.models.transitory.SendRequest;
 import com.enhide.repositories.EmailRepository;
+import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -58,6 +60,10 @@ public class EmailService {
 
 	@Autowired
 	private EmailRepository emailRepository;
+
+  public List<Email> inbox(User user) {
+    return emailRepository.fetchInbox(user);
+  }
 
 	public Pair<ClientResponse, Email> send(SendRequest sendRequest, boolean isTest) throws IOException, ParseException, Exception {
 		Email email = sendRequest.getEmail();

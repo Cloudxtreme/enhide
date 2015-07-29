@@ -38,6 +38,7 @@ public class ResourceServerConfiguration extends
 			.antMatchers("/is/authenticated").authenticated()
 			.antMatchers("/revoke").authenticated()
 			.antMatchers("/greeting").authenticated()
+			.antMatchers("/inbox").authenticated()
 			.antMatchers("/change_password").authenticated()
 			.antMatchers("/signup").anonymous();
 		// @formatter:on
