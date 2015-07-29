@@ -58,6 +58,9 @@ public class EmailService {
 	@Value(value = "${mailgun.resource}")
 	private String resource;
 
+	@Value(value = "${mailgun.test}")
+	private boolean isTest;
+
 	@Autowired
 	private EmailRepository emailRepository;
 
@@ -65,7 +68,7 @@ public class EmailService {
     return emailRepository.fetchInbox(user);
   }
 
-	public Pair<ClientResponse, Email> send(SendRequest sendRequest, boolean isTest) throws IOException, ParseException, Exception {
+	public Pair<ClientResponse, Email> send(SendRequest sendRequest) throws IOException, ParseException, Exception {
 		Email email = sendRequest.getEmail();
 		Assert.notNull(email, "Cannot send blank email");
 		Client client = Client.create();

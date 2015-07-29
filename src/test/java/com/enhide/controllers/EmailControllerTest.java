@@ -7,11 +7,9 @@ import com.enhide.models.persistent.Email;
 import com.enhide.models.persistent.User;
 import com.enhide.repositories.EmailRepository;
 import com.enhide.repositories.UserRepository;
-import com.enhide.services.EmailService;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -34,9 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @SpringApplicationConfiguration(classes = Main.class)
 public class EmailControllerTest extends BaseTest {
-
-  @Autowired
-  private EmailService emailService;
 
   @Autowired
   private EmailRepository emailRepository;
@@ -77,13 +72,31 @@ public class EmailControllerTest extends BaseTest {
     email.setSubject(subject);
 
     emailRepository.save(email);
-    List<Email> inbox = emailService.inbox(findByLogin);
     String accessToken = getAccessToken("admin", "spring");
     mvc.perform(get("/inbox")
-      .header("Authorization", "Bearer " + accessToken))
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$[0].froms[0].value", startsWith("Excited User")))
-      .andExpect(jsonPath("$[0].tos[0].value", startsWith("edwinhere")))
-      .andExpect(jsonPath("$[0].subject", is("Inbox Controller Test")));
+            .header("Authorization", "Bearer " + accessToken))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].froms[0].value", startsWith("Excited User")))
+            .andExpect(jsonPath("$[0].tos[0].value", startsWith("edwinhere")))
+            .andExpect(jsonPath("$[0].subject", is("Inbox Controller Test")));
+  }
+
+  @Test
+  public void sendUnauthorized() throws Exception {
+    mvc.perform(get("/send")
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.error", is("unauthorized")));
+  }
+
+  @Test
+  public void sendAuthorized() throws Exception {
+    String accessToken = getAccessToken("admin", "spring");
+    mvc.perform(get("/send")
+			.accept(MediaType.APPLICATION_JSON)
+			.contentType(MediaType.APPLICATION_JSON)
+      .header("Authorization", "Bearer " + accessToken)
+      .content(""))
+      .andExpect(status().isBadRequest());
   }
 }
