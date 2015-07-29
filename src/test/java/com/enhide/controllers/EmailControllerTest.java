@@ -5,7 +5,6 @@ import com.enhide.Main;
 import com.enhide.models.persistent.Address;
 import com.enhide.models.persistent.Email;
 import com.enhide.models.persistent.User;
-import com.enhide.repositories.BodyRepository;
 import com.enhide.repositories.EmailRepository;
 import com.enhide.repositories.UserRepository;
 import com.enhide.services.EmailService;
@@ -15,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,12 +80,11 @@ public class EmailControllerTest extends BaseTest {
     emailRepository.save(email);
     List<Email> inbox = emailService.inbox(findByLogin);
     String accessToken = getAccessToken("admin", "spring");
-    MvcResult andReturn = mvc.perform(get("/inbox")
-            .header("Authorization", "Bearer " + accessToken))
-            .andExpect(status().isOk()).andReturn();
-    String contentAsString = andReturn.getResponse().getContentAsString();
-    System.out.println("#####################################################");
-    System.out.println(contentAsString);
-    System.out.println("#####################################################");
+    mvc.perform(get("/inbox")
+      .header("Authorization", "Bearer " + accessToken))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$[0].froms[0].value", startsWith("Excited User")))
+      .andExpect(jsonPath("$[0].tos[0].value", startsWith("edwinhere")))
+      .andExpect(jsonPath("$[0].subject", is("Inbox Controller Test")));
   }
 }
